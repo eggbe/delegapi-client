@@ -8,6 +8,7 @@ use \Eggbe\Helpers\Code;
 use \Eggbe\DelegapiClient\Wrapper\Item;
 use \Eggbe\DelegapiClient\Wrapper\Collection;
 use \Eggbe\DelegapiClient\Bridge\SecureBridge;
+use \Eggbe\DelegapiClient\Watcher\Abstracts\AWatcher;
 
 class Client {
 
@@ -24,7 +25,7 @@ class Client {
 	/**
 	 * @var array
 	 */
-	private $Attachable = [];
+	private $Watchers = [];
 
 	/**
 	 * @param array $Config
@@ -45,11 +46,16 @@ class Client {
 		}
 		$this->hash = $Config['hash'];
 
-		if (Arr::has($Config, 'attach')) {
-			if (!is_array($Config['attach'])) {
-				throw new \Exception('Invalid configuration [4]!');
+		if (Arr::has($Config, 'watch') && is_array($Config['watch'])) {
+			foreach($Config['watch'] as $key => $class){
+				if (Arr::has($this->Watchers, ($key = strtolower(trim($key))))){
+					throw new \Exception('Watcher for key "' . $key . '" already exists!');
+				}
+				if (!is_subclass_of($class, AWatcher::class)){
+					throw new \Exception('Invalid configuration [4]!');
+				}
+				$this->Watchers[$key] = new $class();
 			}
-			$this->Attachable = Arr::simplify($Config['attach']);
 		}
 
 	}
@@ -71,9 +77,16 @@ class Client {
 			return $this;
 		}
 
-		$Response = (new SecureBridge($this->url, $this->hash))
-			->to($name)->where($this->namespace)->with($Args)
-				->attach($this->Attachable)->send();
+		$Bridge = (new SecureBridge($this->url, $this->hash))
+			->to($name)->where($this->namespace)->with($Args);
+
+		if (count($this->Watchers) > 0){
+			foreach($this->Watchers as $key => $Watcher){
+				$Bridge->attach([$key => $Watcher->watch()]);
+			}
+		}
+
+		$Response = $Bridge->send();
 
 		$this->namespace = null;
 
