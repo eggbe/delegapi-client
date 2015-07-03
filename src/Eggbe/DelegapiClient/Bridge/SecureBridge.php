@@ -1,7 +1,7 @@
 <?php
 namespace Eggbe\DelegapiClient\Bridge;
 
-use \Eggbe\Helpers\Hash;
+use \Eggbe\Helper\Hash;
 use \Eggbe\ClientBridge\Bridge;
 
 class SecureBridge extends  Bridge{

@@ -1,9 +1,9 @@
 <?php
 namespace Eggbe\DelegapiClient;
 
-use \Eggbe\Helpers\Arr;
-use \Eggbe\Helpers\Hash;
-use \Eggbe\Helpers\Code;
+use \Eggbe\Helper\Arr;
+use \Eggbe\Helper\Hash;
+use \Eggbe\Helper\Code;
 
 use \Eggbe\DelegapiClient\Wrapper\Item;
 use \Eggbe\DelegapiClient\Wrapper\Collection;
