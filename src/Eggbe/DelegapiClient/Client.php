@@ -41,7 +41,7 @@ class Client {
 		}
 		$this->url = $Config['url'];
 
-		if (!Hash::validate($Config['hash'], Hash::VALIDATE_MD5)) {
+		if (!Hash::validate($Config['hash'], Hash::HAST_TYPE_MD5)) {
 			throw new \Exception('Invalid configuration [3]!');
 		}
 		$this->hash = $Config['hash'];
