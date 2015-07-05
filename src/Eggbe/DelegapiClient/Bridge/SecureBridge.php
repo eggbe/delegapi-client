@@ -18,7 +18,7 @@ class SecureBridge extends  Bridge{
 	 */
 	public function __construct($url, $hash) {
 		parent::__construct($url);
-		if (!Hash::validate($hash, Hash::HAST_TYPE_MD5)){
+		if (!Hash::validate($hash, Hash::HASH_TYPE_MD5)){
 			throw new \Exception('Invalid hash format!');
 		}
 		$this->hash = $hash;
