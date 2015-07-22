@@ -2,7 +2,7 @@
 	"name": "eggbe/delegapi-client",
 	"version": "1.1.0",
 	"type": "library",
-	"keywords": ["rest", "api", "client", "server"],
+	"keywords": ["rest", "api", "client", "client-server"],
 	"description": "Client part of the library to construct a client-server architecture.",
 	"license": "MIT",
 	"authors": [
