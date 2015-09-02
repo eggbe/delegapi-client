@@ -69,40 +69,49 @@ class Client {
 	 * @param string $name
 	 * @param array $Args
 	 * @return Client|string
+	 * @throws \Exception
 	 */
 	public function __call($name, array $Args = []) {
 
-		if (is_null($this->namespace)){
+		if (is_null($this->namespace)) {
 			$this->namespace = Code::fromCamelNotation($name, '-');
 			return $this;
 		}
 
-		$Bridge = (new SecureBridge($this->url, $this->hash))
-			->to($name)->where($this->namespace)->with($Args);
+		try {
 
-		if (count($this->Watchers) > 0){
-			foreach($this->Watchers as $key => $Watcher){
-				$Bridge->attach([$key => $Watcher->watch()]);
+			$Bridge = (new SecureBridge($this->url, $this->hash))
+				->to($name)->where($this->namespace)->with($Args);
+
+			if (count($this->Watchers) > 0) {
+				foreach ($this->Watchers as $key => $Watcher) {
+					$Bridge->attach([$key => $Watcher->watch()]);
+				}
 			}
+
+			$Response = $Bridge->send();
+
+			$this->namespace = null;
+
+			if (array_key_exists('item', $Response)) {
+				return new Item($Response['item']);
+			}
+
+			if (array_key_exists('items', $Response)) {
+				return new Collection($Response['items']);
+			}
+
+			if (array_key_exists('result', $Response)) {
+				return $Response['result'];
+			}
+
+			return $Response;
+
+		} catch (\Exception $Exception) {
+			$this->namespace = null;
+			throw $Exception;
 		}
 
-		$Response = $Bridge->send();
-
-		$this->namespace = null;
-
-		if (array_key_exists('item', $Response)){
-			return new Item($Response['item']);
-		}
-
-		if (array_key_exists('items', $Response)){
-			return new Collection($Response['items']);
-		}
-
-		if (array_key_exists('result', $Response)){
-			return $Response['result'];
-		}
-
-		return $Response;
 	}
 
 }
