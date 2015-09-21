@@ -67,12 +67,18 @@ class Collection implements \Iterator {
 	public final function lists($name, $key = null) {
 		$Lists = [];
 		foreach ($this->Items as $Item) {
-			if (!is_null($Item->{$name})) {
+
+			$value = is_array($name)
+				? Arr::only($Item->toArray(), $name)
+					: $Item->{$name};
+
+			if (!empty($value) > 0) {
 				if (is_null($key)) {
-					$Lists[] = $Item->{$name};
+					$Lists[] = $value;
 				} elseif (isset($Item->{$key})) {
-					$Lists[$Item->{$key}] = $Item->{$name};
+					$Lists[$Item->{$key}] = $value;
 				}
+
 			}
 		}
 		return $Lists;
