@@ -60,7 +60,7 @@ class Collection implements \Iterator {
 	}
 
 	/**
-	 * @param string $name
+	 * @param string|array $name
 	 * @param string $key
 	 * @return array
 	 */
