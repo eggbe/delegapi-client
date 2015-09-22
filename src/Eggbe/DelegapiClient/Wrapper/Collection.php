@@ -1,6 +1,8 @@
 <?php
 namespace Eggbe\DelegapiClient\Wrapper;
 
+use \Eggbe\Helper\Arr;
+
 class Collection implements \Iterator {
 
 	/**
