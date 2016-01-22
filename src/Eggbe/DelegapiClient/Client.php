@@ -3,7 +3,7 @@ namespace Eggbe\DelegapiClient;
 
 use \Eggbe\Helper\Arr;
 use \Eggbe\Helper\Hash;
-use \Eggbe\Helper\Code;
+use \Eggbe\Helper\Src;
 
 use \Eggbe\DelegapiClient\Wrapper\Item;
 use \Eggbe\DelegapiClient\Wrapper\Collection;
@@ -74,7 +74,7 @@ class Client {
 	public function __call($name, array $Args = []) {
 
 		if (is_null($this->namespace)) {
-			$this->namespace = Code::fromCamelNotation($name, '-');
+			$this->namespace = Src::frcm($name, '-');
 			return $this;
 		}
 
