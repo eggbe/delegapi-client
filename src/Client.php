@@ -113,8 +113,8 @@ class Client {
 				}
 			}
 
-			return !is_null($this->Wrapper)
-				? $this->Wrapper($Bridge->send()) : $Bridge->send();
+			return !is_null($this->Wrapper) ? $this->Wrapper->call($this,
+				$Bridge->send()) : $Bridge->send();
 
 		} finally {
 			$this->namespace = null;
