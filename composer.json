@@ -1,9 +1,9 @@
 {
 	"name": "eggbe/delegapi-client",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"type": "library",
-	"keywords": ["rest", "api", "client", "client-server"],
-	"description": "Client part of the library to construct a client-server architecture.",
+	"keywords": ["rest", "api", "client-side", "server-to-server", "high-performance"],
+	"description": "The client part of the library to construct applications based on  the server-to-server architecture.",
 	"license": "MIT",
 	"authors": [
 		{
@@ -17,8 +17,8 @@
 		"eggbe/client-bridge": "dev-master"
 	},
 	"autoload": {
-		"psr-0": {
-			"Eggbe\\DelegapiClient": "src/"
+		"psr-4": {
+			"Eggbe\\DelegapiClient\\": "src/"
 		}
 	}
 }
