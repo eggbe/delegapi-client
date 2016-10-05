@@ -104,7 +104,7 @@ class Client {
 		}
 
 		try {
-			$Bridge = (new Bridge($this->url))->withToken($this->token)
+			$Bridge = (new Bridge($this->url, Bridge::RM_POST))->withToken($this->token)
 				->withMethod($name)->withNamespace($this->namespace)->withParams($Args);
 
 			if (count($this->Watchers) > 0) {
