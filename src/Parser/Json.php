@@ -5,7 +5,7 @@ use \Eggbe\DelegapiClient\Parser\Abstracts\AParser;
 
 class Json extends AParser {
 
-	public final function parse(string $Response): array {
+	public function parse(string $Response): array {
 		if (is_null($Response = json_decode($Response, true))){
 			throw new \Exception('Invalid response!');
 		}
