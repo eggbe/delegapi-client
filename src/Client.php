@@ -2,10 +2,14 @@
 namespace Eggbe\DelegapiClient;
 
 use \Eggbe\Helper\Arr;
-use \Eggbe\Helper\Hash;
 use \Eggbe\Helper\Src;
+use \Eggbe\Helper\Str;
+use \Eggbe\Helper\Hash;
 
 use \Eggbe\ClientBridge\Bridge;
+
+use \Eggbe\DelegapiClient\Parser\Json;
+use \Eggbe\DelegapiClient\Parser\Abstracts\AParser;
 
 use \Eggbe\DelegapiClient\Watcher\Abstracts\AWatcher;
 
@@ -17,25 +21,66 @@ class Client {
 	private $url = null;
 
 	/**
-	 * @var string
+	 * @var array
 	 */
-	private $token = null;
+	private $Arguments = [];
+
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @throws \Exception
+	 */
+	public final function addArgument(string $name, string $value){
+		/**
+		 * Some keys are reserved for system use so we have to be sure
+		 * about nobody will be able to break down this mechanism.
+		 */
+		if (in_array($name, ['namespace', 'method', 'params'])) {
+			throw new \Exception('Can\'t use reserved key "' . $name . '" for custom needs!');
+		}
+
+		/**
+		 * To prevent potential errors it's impossible
+		 * to reassign an already existing argument.
+		 */
+		if (Arr::has($this->Arguments, $name)) {
+			throw new \Exception('Argument with name "' . $name . '" is already registered!');
+		}
+
+		$this->Arguments[$name] = $value;
+	}
 
 	/**
 	 * @param string $url
-	 * @param string $token
+	 * @param array $Arguments
 	 * @throws \Exception
 	 */
-	public function __construct($url, $token) {
+	public function __construct($url, array $Arguments = []) {
 		if (!filter_var($url = strtolower(trim($url)), FILTER_VALIDATE_URL)) {
 			throw new \Exception('Invalid url!');
 		}
 		$this->url = $url;
 
-		if (strlen($token) != 32 || !ctype_xdigit($token)) {
-			throw new \Exception('Invalid security token!');
+		foreach ($Arguments as $name => $value){
+			$this->addArgument($name, Str::cast($value));
 		}
-		$this->token = $token;
+	}
+
+	/**
+	 * @var null
+	 */
+	private $Parser = null;
+
+	/**
+	 * @param AParser $Parser
+	 * @throws \Exception
+	 */
+	public final function registerParser(AParser $Parser){
+		if (!is_null($this->Parser)) {
+			throw new \Exception('Parser is already registered!');
+		}
+
+		$this->Parser = $Parser;
 	}
 
 	/**
@@ -47,7 +92,7 @@ class Client {
 	 * @param \Closure $Wrapper
 	 * @throws \Exception
 	 */
-	public final function addWrapper(\Closure $Wrapper) {
+	public final function registerWrapper(\Closure $Wrapper) {
 		if (!is_null($this->Wrapper)) {
 			throw new \Exception('Wrapper is already registered!');
 		}
@@ -67,16 +112,16 @@ class Client {
 	public final function addWatcher(AWatcher $Watcher) {
 
 		/**
-		 * Three keys are always use for system needs so we have to be
-		 * sure that nobody will be able to break this logic.
+		 * Some keys are reserved for system use so we have to be sure
+		 * about nobody will be able to break down this mechanism.
 		 */
 		if (in_array($Watcher->getKey(), ['namespace', 'method', 'params'])) {
 			throw new \Exception('Can\'t use reserved key "' . $Watcher->getKey() . '" for custom needs!');
 		}
 
 		/**
-		 * To prevent all kind of potential errors, the reassigning
-		 * of already existing keys isn't possible.
+		 * To prevent potential errors it's impossible
+		 * to reassign an already existing watcher.
 		 */
 		if (Arr::has($this->Watchers, $Watcher->getKey())) {
 			throw new \Exception('Watcher for key "' . $Watcher->getKey() . '" is already registered!');
@@ -97,24 +142,29 @@ class Client {
 	 * @throws \Exception
 	 */
 	public function __call($name, array $Args = []) {
-
 		if (is_null($this->namespace)) {
 			$this->namespace = Src::frcm($name, '-');
 			return $this;
 		}
 
 		try {
-			$Bridge = (new Bridge($this->url, Bridge::RM_POST))->withToken($this->token)
-				->withMethod($name)->withNamespace($this->namespace)->withParams($Args);
+			$Bridge = (new Bridge($this->url, Bridge::RM_POST))->withMethod($name)
+				->withNamespace($this->namespace)->withParams($Args);
 
-			if (count($this->Watchers) > 0) {
-				foreach ($this->Watchers as $Watcher) {
-					$Bridge->with($Watcher->getKey(), $Watcher->watch());
-				}
+			foreach ($this->Arguments as $name => $value) {
+				$Bridge->with($name, $value);
+			}
+
+			foreach ($this->Watchers as $Watcher) {
+				$Bridge->with($Watcher->getKey(), $Watcher->watch());
+			}
+
+			if (is_null($this->Parser)){
+				$this->Parser = new Json();
 			}
 
 			return !is_null($this->Wrapper) ? $this->Wrapper->call($this,
-				$Bridge->send()) : $Bridge->send();
+				$this->Parser->parse($Bridge->send())) : $Bridge->send();
 
 		} finally {
 			$this->namespace = null;
