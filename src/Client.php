@@ -1,10 +1,10 @@
 <?php
 namespace Eggbe\DelegapiClient;
 
-use \Eggbe\Helper\Arr;
-use \Eggbe\Helper\Src;
-use \Eggbe\Helper\Str;
-use \Eggbe\Helper\Hash;
+use \Able\Helpers\Arr;
+use \Able\Helpers\Src;
+use \Able\Helpers\Str;
+use \Able\Helpers\Hash;
 
 use \Eggbe\ClientBridge\Bridge;
 

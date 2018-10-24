@@ -1,7 +1,7 @@
 <?php
 namespace Eggbe\DelegapiClient\Watcher\Abstracts;
 
-use \Eggbe\Helper\Src;
+use \Able\Helpers\Src;
 
 abstract class AWatcher {
 
