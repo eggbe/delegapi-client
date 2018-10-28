@@ -14,7 +14,7 @@ abstract class AWatcher {
 	 * @return string
 	 */
 	public function getKey() {
-		return is_null($this->key) ? Src::frcm(preg_replace('/^.*\\\/',
+		return is_null($this->key) ? Src::fcm(preg_replace('/^.*\\\/',
 			null, get_class($this))) : $this->key;
 	}
 
