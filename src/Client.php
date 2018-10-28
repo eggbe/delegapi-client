@@ -143,7 +143,7 @@ class Client {
 	 */
 	public function __call($name, array $Args = []) {
 		if (is_null($this->namespace)) {
-			$this->namespace = Src::frcm($name, '-');
+			$this->namespace = Src::fcm($name, '-');
 			return $this;
 		}
 
