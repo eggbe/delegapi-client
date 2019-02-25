@@ -1,6 +1,5 @@
 {
 	"name": "eggbe/delegapi-client",
-	"version": "3.0.0",
 	"type": "library",
 	"keywords": ["rest", "api", "client-side", "server-to-server", "high-performance"],
 	"description": "The client part of the library to construct applications based on  the server-to-server architecture.",
